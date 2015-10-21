@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>SwitchHosts</title>
+    <link href="./css/style.css" type="text/css" rel="stylesheet">
+    <link rel="stylesheet" href="./css/font-awesome/css/font-awesome.min.css">
+    <script src="./js/jquery-2.1.4.min.js" charset="utf-8"></script>
+  </head>
+  <body>
+  <div id="main-container">
+    <div id="side-part">
+      <div id="folder-tree">
+          <ul>
+            <li>
+              <span class="tree-title" id="root-tree"><i class="fa fa-minus-square-o"></i>&nbsp;<i class="fa fa-folder"></i>&nbsp;hosts</span>
+              <ul>
+                <li class="second-tree" id="public-host">
+                  <img src="./resources/images/icon_0.png" /><span class="tree-title">公用hosts</span>
+                </li>
+                <li class="second-tree" id="current-host">
+                  <img src="./resources/images/icon_0.png" /><span class="tree-title"> 当前hosts</span>
+                </li>
+                <li class="second-tree">
+                  <i class="fa fa-minus-square-o"></i>&nbsp;<i class="fa fa-folder"></i>&nbsp;<span class="tree-title">本地方案</span>
+                  <ul id="local-host-list">
+                    <li class="leaf-node accept" id="node1">
+                      <img src="./resources/images/icon_0.png" /><span>什么都没有</span>
+                    </li>
+                    <li class="leaf-node" id="node2">
+                      <img src="./resources/images/icon_1.png" /><span>外网开发</span>
+                    </li>
+                  </ul>
+                </li>
+                <li class="second-tree">
+                  <i class="fa fa-minus-square-o"></i>&nbsp;<i class="fa fa-folder"></i>&nbsp;<span class="tree-title">在线方案</span>
+                </li>
+              </ul>
+            </li>
+          </ul>
+      </div>
+
+      <div id="operation">
+        <ul>
+          <li id="add-btn"><img src="./resources/images/add.png" alt="增加" /></li>
+          <li id="refresh-btn"><img src="./resources/images/refresh.png" alt="刷新" /></li>
+          <li id="edit-btn"><img src="./resources/images/pencil.png" alt="编辑" /></li>
+          <li id="del-btn"><img src="./resources/images/delete.png" alt="删除" /></li>
+        </ul>
+      </div>
+    </div>
+
+    <div id="main-content">
+      <div id="edit-panel">
+        <div id="edit-area" contenteditable="true"></div>
+      </div>
+
+      <div id="accept-btn">
+        <button type="button" name="accept-btn"><img src="./resources/images/accept.png" alt="使用按钮" /></button>
+      </div>
+    </div>
+  </div>
+  <script src="./js/app.js" charset="utf-8"></script>
+</body>
+</html>

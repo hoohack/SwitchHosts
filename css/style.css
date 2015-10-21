@@ -1,0 +1,109 @@
+* {
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  /*width: 800px;
+  height: 600px;*/
+}
+
+#main-container, #side-part, #main-content{
+  height: 570px;
+}
+
+#main-container #side-part {
+  float: left;
+  width: 250px;
+  border-right: 1px solid #BDBDBD;
+}
+
+#main-content {
+  margin-left: 252px;
+  width: 540px;
+}
+
+#edit-panel {
+  height: 540px;
+  width: 545px;
+  border-bottom: 1px solid #BDBDBD;
+  overflow: auto;
+}
+
+#folder-tree {
+  height: 540px;
+  border-bottom: 1px solid #BDBDBD;
+  background: #E0ECF8;
+}
+
+#folder-tree span:hover {
+  cursor: default;
+}
+
+#root-tree, .second-tree {
+  color: #BDBDBD;
+}
+
+#public-host {
+  color: blue;
+}
+
+#current-host {
+  color: black;
+  font-weight: bold;
+}
+
+.second-tree i, .tree-title i , .leaf-node i {
+  text-indent: 0em;
+}
+
+.leaf-node span {
+  color: black;
+}
+
+.accept {
+  font-weight: bold;
+}
+
+.second-tree {
+  text-indent: 2em;
+}
+
+.leaf-node {
+  text-indent: 4em;
+}
+
+#operation {
+  padding: 8px 10px;
+}
+
+#operation ul li{
+  display: inline-block;
+}
+
+#accept-btn {
+  height: 30px;
+}
+
+#accept-btn button {
+  float: right;
+  margin-top: 5px;
+  padding: 2px 15px;
+  height: auto;
+  text-shadow: 1px 1px 1px rgba(255,255,255, .22);
+  border-radius: 5px;
+}
+
+#edit-area {
+  width: 900px;
+  min-height: 520px;
+  outline: 0;
+  word-wrap: break-word;
+  font-size: 14px;
+  border: 1px solid #a0b3d6;
+  border-left: 15px solid #F2F2F2;
+}
+
+.active-li {
+  background-color: #81BEF7;
+}

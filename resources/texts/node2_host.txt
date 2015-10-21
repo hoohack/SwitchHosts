@@ -1,0 +1,2 @@
+#外网开发
+58.215.143.173  www.up24.com store.up24.com s.up24.com api.up24.com

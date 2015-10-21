@@ -1,0 +1,12 @@
+{
+	"name" : "SwitchHosts",
+	"main" : "index.html",
+	"window" : {
+			"toolbar" : false,
+			"width" : 807,
+			"height": 607,
+			"title" : "SwitchHosts"
+	},
+	"version" : "0.1.0",
+	"show_in_tackbar" : "true"
+}

@@ -57,13 +57,36 @@ $('#public-host').click(function() {
     $('.active-li').removeClass('active-li');
   }
   $(this).addClass('active-li');
+  var result = '';
   var fs = require('fs');
-  fs.readFile('./resources/texts/public_host.txt', function (err, data) {
-     if (err) {
-         return console.error(err);
-     }
-     $('#edit-area').html(data.toString());
-  });
+
+  function readLines(input) {
+    var remaining = '',
+      flag = false;
+    input.on('data', function(data) {
+      remaining += data;
+      flag = true;
+      var index = remaining.indexOf('\n');
+      while (index > -1) {
+        var line = remaining.substring(0, index);
+        remaining = remaining.substring(index + 1);
+        line = line + '<br />';
+        result += line;
+        index = remaining.indexOf('\n');
+      }
+      $('#edit-area').html(result);
+    });
+
+    input.on('end', function() {
+      if (!flag) {
+        result += '<br />';
+        $('#edit-area').html(result);
+      }
+    });
+  }
+  var input = fs.createReadStream('./resources/texts/public_host.txt');
+  readLines(input);
+  $('#edit-area').attr('contenteditable', true);
 });
 
 $('#public-host').dblclick(function() {
@@ -104,7 +127,7 @@ $('#current-host').click(function() {
   }
   var input = fs.createReadStream('/etc/hosts');
   readLines(input);
-
+  $('#edit-area').attr('contenteditable', false);
 });
 
 var local_host_list = $('ul#local-host-list').children();
@@ -143,6 +166,7 @@ if (local_host_list.length != 0) {
     }
     var input = fs.createReadStream('./resources/texts/' + class_name + '_host.txt');
     readLines(input);
+    $('#edit-area').attr('contenteditable', true);
   });
 
   local_host_list.dblclick(function() {
@@ -173,14 +197,14 @@ if (local_host_list.length != 0) {
       }
     });
 
-    hostReadStream.on('drain', function() { // 写完后，继续读取
-        readStream.resume();
+    writeStream.on('drain', function() { // 写完后，继续读取
+        hostReadStream.resume();
     });
 
     hostReadStream.on('end', function() {
       writeStream.end();
     });
-
+    $('#edit-area').attr('contenteditable', true);
   });
 }
 
@@ -224,4 +248,42 @@ $('.minus-folder').click(function() {
       $(this).addClass('fa-minus-square-o');
     }
   }
+});
+
+function filterTag(str) {
+  return str.replace(/(\<div\>)/gm, "")
+  .replace(/&nbsp;&nbsp;&nbsp;&nbsp;/g, "\t")
+  .replace(/&nbsp;/g, '')
+  .replace(/(\<\/div\>)/g, "\n")
+  .replace(/(\<br\>)/g, "\n");
+}
+
+$('#edit-area').keydown(function(event) {
+    if (event.which == 9) {
+      var tabSpace = '&nbsp;&nbsp;&nbsp;&nbsp;';
+      if (document.all){
+        document.selection.createRange().pasteHTML(tabSpace);
+      } else {
+        document.execCommand('InsertHtml', null, tabSpace);
+      }
+      return false;
+    }
+    //19 for Mac Command+S
+    if (!( String.fromCharCode(event.which).toLowerCase() == 's' && event.ctrlKey) && !(event.which == 19)) return true;
+    var fs = require('fs');
+    var data = filterTag($(this).html());
+    var writerStream = fs.createWriteStream('./resources/texts/public_host.txt');
+    writerStream.write(data, 'UTF8');
+    writerStream.end();
+
+    writerStream.on('finish', function() {
+        console.log("finish");
+    });
+
+    writerStream.on('error', function(err){
+       console.log(err.stack);
+    });
+
+    event.preventDefault();
+    return false;
 });

@@ -151,37 +151,77 @@ if (local_host_list.length != 0) {
     }
     $(this).addClass('accept');
     var class_name = $(this).attr('id');
+
+
     var fs = require('fs');
+    var readStream = fs.createReadStream('./resources/texts/public_host.txt');
+    var writeStream = fs.createWriteStream('/etc/hosts');
 
-    function writeLines(input) {
-      input.on('data', function(data) {
-        fs.open("/etc/hosts", "w", 0666, function(e,fd){
-            if(e) throw e;
-            fs.write(fd, data , 0, 'utf8',function(e){
-                if(e) throw e;
-                // fs.closeSync(fd);
-            });
-        });
-      });
-    }
+    readStream.on('data', function(chunk) { // 当有数据流出时，写入数据
+        if (writeStream.write(chunk) === false) { // 如果没有写完，暂停读取流
+            readStream.pause();
+        }
+    });
 
-    function addContent(input) {
-      input.on('data', function(data) {
-        console.log(data);
-        fs.open("/etc/hosts", "a" , 0666, function(e,fd){
-          if(e) throw e;
-          fs.write(fd, data, function(e){
-              if(e) throw e;
-              // fs.closeSync(fd);
-          });
-        });
-      });
-    }
-    var public_content = fs.createReadStream('./resources/texts/public_host.txt');
-    public_content.setEncoding('UTF8');
-    writeLines(public_content);
-    var host_content = fs.createReadStream('./resources/texts/' + class_name + '_host.txt');
-    host_content.setEncoding('UTF8');
-    addContent(host_content);
+    writeStream.on('drain', function() { // 写完后，继续读取
+        readStream.resume();
+    });
+    var hostReadStream = fs.createReadStream('./resources/texts/' + class_name + '_host.txt');
+    hostReadStream.on('data', function(chunk) {
+      if (writeStream.write(chunk) == false) {
+        hostReadStream.pause();
+      }
+    });
+
+    hostReadStream.on('drain', function() { // 写完后，继续读取
+        readStream.resume();
+    });
+
+    hostReadStream.on('end', function() {
+      writeStream.end();
+    });
+
   });
 }
+
+$('#root-minus').click(function() {
+  var next_ul = $(this).parent().find('ul');
+  if (next_ul.length != 0) {
+    if ($(this).attr('class').indexOf('fa-minus-square-o') != -1) {
+      next_ul.hide();
+      $(this).removeClass('fa-minus-square-o');
+      $(this).addClass('fa-plus-square-o');
+    } else {
+      next_ul.show();
+      $(this).removeClass('fa-plus-square-o');
+      $(this).addClass('fa-minus-square-o');
+      if ($('#local-host-list').length != 0) {
+        var next_minus = $('#local-host-list').parent().find('i').first();
+        if (next_minus.attr('class').indexOf('fa-plus-square-o') != -1) {
+          $('#local-host-list').hide();
+        }
+      }
+      if ($('#online-host-list').length != 0) {
+        var next_minus = $('#online-host-list').parent().find('i').first();
+        if (next_minus.attr('class').indexOf('fa-plus-square-o') != -1) {
+          $('#online-host-list').hide();
+        }
+      }
+    }
+  }
+});
+
+$('.minus-folder').click(function() {
+  var next_ul = $(this).parent().find('ul');
+  if (next_ul.length != 0) {
+    if ($(this).attr('class').indexOf('fa-minus-square-o') != -1) {
+      next_ul.hide();
+      $(this).removeClass('fa-minus-square-o');
+      $(this).addClass('fa-plus-square-o');
+    } else {
+      next_ul.show();
+      $(this).removeClass('fa-plus-square-o');
+      $(this).addClass('fa-minus-square-o');
+    }
+  }
+});

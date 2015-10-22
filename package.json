@@ -8,5 +8,6 @@
 			"title" : "SwitchHosts"
 	},
 	"version" : "0.1.0",
-	"show_in_tackbar" : "true"
+	"show_in_tackbar" : "true",
+	"chromium-args": "--disable-setuid-sandbox"
 }

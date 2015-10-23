@@ -1,2 +1,1 @@
-# 方案 什么都没有
-127.0.0.1 localhost
+#nothing

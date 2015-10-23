@@ -70,7 +70,7 @@ $('#public-host').click(function() {
       while (index > -1) {
         var line = remaining.substring(0, index);
         remaining = remaining.substring(index + 1);
-        line = line + '<br />';
+        line = line + '<br>';
         result += line;
         index = remaining.indexOf('\n');
       }
@@ -79,7 +79,7 @@ $('#public-host').click(function() {
 
     input.on('end', function() {
       if (!flag) {
-        result += '<br />';
+        result += '<br>';
         $('#edit-area').html(result);
       }
     });
@@ -107,7 +107,7 @@ $('#current-host').click(function() {
       while (index > -1) {
         var line = remaining.substring(0, index);
         remaining = remaining.substring(index + 1);
-        line = line + '<br />';
+        line = line + '<br>';
         result += line;
         index = remaining.indexOf('\n');
       }
@@ -116,7 +116,7 @@ $('#current-host').click(function() {
 
     input.on('end', function() {
       if (!flag) {
-        result += '<br />';
+        result += '<br>';
         $('#edit-area').html(result);
       }
     });
@@ -139,14 +139,16 @@ if (local_host_list.length != 0) {
     var fs = require('fs');
 
     function readLines(input) {
-      var remaining = '';
+      var remaining = '',
+        flag = false;
       input.on('data', function(data) {
         remaining += data;
+        flag = true;
         var index = remaining.indexOf('\n');
         while (index > -1) {
           var line = remaining.substring(0, index);
           remaining = remaining.substring(index + 1);
-          line = line + '<br />';
+          line = line + '<br>';
           result += line;
           index = remaining.indexOf('\n');
         }
@@ -155,7 +157,7 @@ if (local_host_list.length != 0) {
 
       input.on('end', function() {
         if (!flag) {
-          result += '<br />';
+          result += '<br>';
           $('#edit-area').html(result);
         }
       });
@@ -285,13 +287,25 @@ $('#edit-area').keydown(function(event) {
 
     //19 for Mac Command+S
     if (!( String.fromCharCode(event.which).toLowerCase() == 's' && event.ctrlKey) && !(event.which == 19)) return true;
-    var fs = require('fs');
-    var html_str = $(this).html();
+
+    var fs = require('fs'),
+      html_str = $(this).html(),
+      file_name_prefix = $('.active-li').attr('id');
+
+    if (file_name_prefix == 'public-host') {
+      file_name_prefix = 'public';
+    }
+
+    if (file_name_prefix == 'current-host') {
+      return false;
+    }
+
     if (html_str.indexOf('<br>') == -1 && html_str.length != 0) {
       html_str += "<br>";
     }
+    alert(html_str);
     var data = filterTag(html_str);
-    var writerStream = fs.createWriteStream('./resources/texts/public_host.txt');
+    var writerStream = fs.createWriteStream('./resources/texts/' + file_name_prefix + '_host.txt');
     writerStream.write(data, 'UTF8');
     writerStream.end();
 

@@ -135,7 +135,7 @@ body {
 }
 
 #add-form {
-  display: none;
+  /*display: none;*/
   position: absolute;
   top: 25%;
   left: 22%;

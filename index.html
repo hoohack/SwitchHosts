@@ -60,6 +60,30 @@
       </div>
     </div>
   </div>
+  <div id="bg"></div>
+  <div id="add-form">
+    <form name="add-form" action="" method="post">
+      <div id="option-head">
+        <label><input type="radio" id="local-host" name="host-type" value="1" checked="checked">&nbsp;本地方案</label>
+        <label><input type="radio" id="online-host" name="host-type" value="">&nbsp;在线方案</label>
+      </div>
+
+      <div class="host-name">
+        <label for="host-name">方案名 : </label>
+        <input type="text" name="host-name" id="host-name">
+      </div>
+
+      <div class="url">
+        <label for="url">URL : </label>
+        <input type="text" name="url" id="url" value="http://">
+      </div>
+
+      <div class="btn">
+        <input type="button" class="form-btn" id="ok-btn" name="ok-btn" value="OK">
+        <input type="button" class="form-btn" id="cancel-btn" name="cancel-btn" value="cancel">
+      </div>
+    </form>
+  </div>
   <script src="./js/app.js" charset="utf-8"></script>
 </body>
 </html>

@@ -303,7 +303,6 @@ $('#edit-area').keydown(function(event) {
     if (html_str.indexOf('<br>') == -1 && html_str.length != 0) {
       html_str += "<br>";
     }
-    alert(html_str);
     var data = filterTag(html_str);
     var writerStream = fs.createWriteStream('./resources/texts/' + file_name_prefix + '_host.txt');
     writerStream.write(data, 'UTF8');
@@ -319,4 +318,35 @@ $('#edit-area').keydown(function(event) {
 
     event.preventDefault();
     return false;
+});
+
+$('#add-btn').on('click', function() {
+  $('#bg').show();
+  $('#add-form').show();
+});
+
+$('#refresh-btn').on('click', function() {
+  alert('click refresh');
+});
+
+$('#edit-btn').on('click', function() {
+  alert('click edit');
+});
+
+$('#del-btn').on('click', function() {
+  alert('click del');
+});
+
+$('#cancel-btn').on('click', function() {
+  $('#bg').hide();
+  $('#add-form').hide();
+});
+
+$('#bg').on('click', function() {
+  $('#bg').hide();
+  $('#add-form').hide();
+});
+
+$('#ok-btn').on('click', function() {
+  
 });

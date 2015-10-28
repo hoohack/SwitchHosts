@@ -126,86 +126,6 @@ $('#current-host').click(function() {
   $('#edit-area').attr('contenteditable', false);
 });
 
-var local_host_list = $('ul#local-host-list').children();
-if (local_host_list.length != 0) {
-  local_host_list.click(function() {
-    var class_name = $(this).attr('id');
-    if ($('.active-li')) {
-      $('.active-li').removeClass('active-li');
-    }
-    $(this).addClass('active-li');
-    var result = '',
-      flag = false;
-    var fs = require('fs');
-
-    function readLines(input) {
-      var remaining = '',
-        flag = false;
-      input.on('data', function(data) {
-        remaining += data;
-        flag = true;
-        var index = remaining.indexOf('\n');
-        while (index > -1) {
-          var line = remaining.substring(0, index);
-          remaining = remaining.substring(index + 1);
-          line = line + '<br>';
-          result += line;
-          index = remaining.indexOf('\n');
-        }
-        $('#edit-area').html(result);
-      });
-
-      input.on('end', function() {
-        if (!flag) {
-          result += '<br>';
-          $('#edit-area').html(result);
-        }
-      });
-    }
-    var input = fs.createReadStream('./resources/texts/' + class_name + '_host.txt');
-    readLines(input);
-    $('#edit-area').attr('contenteditable', true);
-  });
-
-  local_host_list.dblclick(function() {
-    if ($('.accept')) {
-      $('.accept').removeClass('accept');
-    }
-    $(this).addClass('accept');
-    var class_name = $(this).attr('id');
-
-
-    var fs = require('fs');
-    var readStream = fs.createReadStream('./resources/texts/public_host.txt');
-    var writeStream = fs.createWriteStream('/etc/hosts');
-
-    readStream.on('data', function(chunk) { // 当有数据流出时，写入数据
-        if (writeStream.write(chunk) === false) { // 如果没有写完，暂停读取流
-            readStream.pause();
-        }
-    });
-
-    writeStream.on('drain', function() { // 写完后，继续读取
-        readStream.resume();
-    });
-    var hostReadStream = fs.createReadStream('./resources/texts/' + class_name + '_host.txt');
-    hostReadStream.on('data', function(chunk) {
-      if (writeStream.write(chunk) == false) {
-        hostReadStream.pause();
-      }
-    });
-
-    writeStream.on('drain', function() { // 写完后，继续读取
-        hostReadStream.resume();
-    });
-
-    hostReadStream.on('end', function() {
-      writeStream.end();
-    });
-    $('#edit-area').attr('contenteditable', true);
-  });
-}
-
 $('#root-minus').click(function() {
   var next_ul = $(this).parent().find('ul');
   if (next_ul.length != 0) {
@@ -221,12 +141,6 @@ $('#root-minus').click(function() {
         var next_minus = $('#local-host-list').parent().find('i').first();
         if (next_minus.attr('class').indexOf('fa-plus-square-o') != -1) {
           $('#local-host-list').hide();
-        }
-      }
-      if ($('#online-host-list').length != 0) {
-        var next_minus = $('#online-host-list').parent().find('i').first();
-        if (next_minus.attr('class').indexOf('fa-plus-square-o') != -1) {
-          $('#online-host-list').hide();
         }
       }
     }
@@ -320,13 +234,61 @@ $('#edit-area').keydown(function(event) {
     return false;
 });
 
+function addHost()
+{
+  if ($('#host-name').val().length != 0) {
+    var fs = require('fs'),
+      pinyin = require("pinyin");
+    var hostData = fs.readFileSync('./hostList.json'),
+      img_idx = parseInt(Math.random() * 6 + 1),
+      hostList = JSON.parse(hostData);
+    var host_name = 'node' + (hostList.length+1);
+    var file_name = './resources/texts/' + host_name + '_host.txt';
+    fs.open(file_name, 'w', function(err, fd) {
+       if (err) {
+           return console.error(err);
+       }
+       fs.writeFile(file_name, '#方案 ' + $('#host-name').val() + '\n', function(err) {
+         if (err)
+          return console.error(err);
+          hostList[hostList.length] = {"id" : "node" + (hostList.length+1), "name" : $('#host-name').val(), "active" : false, "img_name" : "icon_" + img_idx + ".png"};
+          fs.writeFile('./hostList.json', JSON.stringify(hostList), function(err) {
+            if (err)
+              return console.error(err);
+            SwitchHosts.start();
+            $('#bg').hide();
+            $('#add-form').hide();
+          });
+       });
+    });
+  }
+}
+
+function bindOkBtn()
+{
+  $('#ok-btn').on('click', function() {
+    addHost();
+  });
+}
+
+function bindEnterBtn()
+{
+  $('#add-form').keydown(function(event) {
+    if (event.which == 13) {
+      addHost();
+    }
+  });
+}
+
 $('#add-btn').on('click', function() {
   $('#bg').show();
   $('#add-form').show();
+  bindOkBtn();
+  bindEnterBtn();
 });
 
 $('#refresh-btn').on('click', function() {
-  alert('click refresh');
+  SwitchHosts.start();
 });
 
 $('#edit-btn').on('click', function() {
@@ -345,8 +307,4 @@ $('#cancel-btn').on('click', function() {
 $('#bg').on('click', function() {
   $('#bg').hide();
   $('#add-form').hide();
-});
-
-$('#ok-btn').on('click', function() {
-  
 });

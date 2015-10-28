@@ -31,3 +31,6 @@ shost_linux
 
 #releash bash
 release.sh
+
+#config file
+hostList.json

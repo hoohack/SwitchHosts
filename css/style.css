@@ -140,7 +140,7 @@ body {
   top: 25%;
   left: 22%;
   width: 53%;
-  height: 30%;
+  height: 20%;
   padding: 8px;
   border: 8px solid #E8E9F7;
   background-color: #F2F2F2;
@@ -158,12 +158,6 @@ body {
 
 .host-name label, .url label, .btn {
   margin-left: 10px;
-}
-
-.host-name label, .url label {
-  display: inline-block;
-  width: 16%;
-  text-align:right;
 }
 
 .host-name, .url {

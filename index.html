@@ -23,17 +23,7 @@
                 </li>
                 <li class="second-tree">
                   <i class="fa fa-minus-square-o minus-folder"></i>&nbsp;<i class="fa fa-folder"></i>&nbsp;<span class="tree-title">本地方案</span>
-                  <ul id="local-host-list">
-                    <li class="leaf-node accept" id="node1">
-                      <img src="./resources/images/icon_0.png" /><span>什么都没有</span>
-                    </li>
-                    <li class="leaf-node" id="node2">
-                      <img src="./resources/images/icon_1.png" /><span>外网开发</span>
-                    </li>
-                  </ul>
-                </li>
-                <li class="second-tree">
-                  <i class="fa fa-minus-square-o minus-folder"></i>&nbsp;<i class="fa fa-folder"></i>&nbsp;<span class="tree-title">在线方案</span>
+                  <ul id="local-host-list"></ul>
                 </li>
               </ul>
             </li>
@@ -65,17 +55,11 @@
     <form name="add-form" action="" method="post">
       <div id="option-head">
         <label><input type="radio" id="local-host" name="host-type" value="1" checked="checked">&nbsp;本地方案</label>
-        <label><input type="radio" id="online-host" name="host-type" value="">&nbsp;在线方案</label>
       </div>
 
       <div class="host-name">
         <label for="host-name">方案名 : </label>
         <input type="text" name="host-name" id="host-name">
-      </div>
-
-      <div class="url">
-        <label for="url">URL : </label>
-        <input type="text" name="url" id="url" value="http://">
       </div>
 
       <div class="btn">
@@ -84,6 +68,12 @@
       </div>
     </form>
   </div>
+  <script src="./js/switchhosts.js" charset="utf-8"></script>
   <script src="./js/app.js" charset="utf-8"></script>
+  <script type="text/javascript">
+  $(function() {
+    SwitchHosts.start();
+  });
+  </script>
 </body>
 </html>

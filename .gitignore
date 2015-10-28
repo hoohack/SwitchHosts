@@ -34,3 +34,6 @@ release.sh
 
 #config file
 hostList.json
+
+#resources text
+resources/texts

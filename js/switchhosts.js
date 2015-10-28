@@ -4,6 +4,7 @@ var SwitchHosts = (function() {
 
   function start()
   {
+    $localHostList.empty();
     loadHostList();
     bindClick();
   }
@@ -38,7 +39,6 @@ var SwitchHosts = (function() {
     }
 
     $.each(hostList, function(idx, obj) {
-    	// alert(obj.name);
       if ($('#' + obj.id).length == 0) {
         var new_node = $('<li></li>'),
           node_span = $('<span></span>'),

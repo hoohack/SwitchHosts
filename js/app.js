@@ -296,7 +296,34 @@ $('#edit-btn').on('click', function() {
 });
 
 $('#del-btn').on('click', function() {
-  alert('click del');
+  if ($('.active-li').length != 0) {
+    var cur_node = $('.active-li'),
+      node_id = $('.active-li').attr('id');
+    if (node_id != 'public-host' && node_id != 'current-host') {
+      var fs = require('fs');
+      var hostData = fs.readFileSync('./hostList.json'),
+        hostList = JSON.parse(hostData);
+        var index = -1;
+        $.each(hostList, function(idx, obj) {
+          if (obj.id == node_id) {
+            index = idx;
+          }
+        });
+        if (index != -1) {
+          hostList.splice(index, 1);
+          fs.writeFile('./hostList.json', JSON.stringify(hostList), function(err) {
+            if (err)
+              return console.error(err);
+            SwitchHosts.start();
+            fs.unlink('./resources/texts/' + node_id + '_host.txt', function (err) {
+              if (err)
+                return console.error(err);
+              console.log("file delete success");
+            });
+          });
+        }
+    }
+  }
 });
 
 $('#cancel-btn').on('click', function() {

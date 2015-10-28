@@ -134,7 +134,7 @@ body {
   filter: alpha(opacity=0);
 }
 
-#add-form {
+#add-form , #edit-form {
   display: none;
   position: absolute;
   top: 25%;

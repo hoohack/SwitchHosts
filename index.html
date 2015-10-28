@@ -68,6 +68,24 @@
       </div>
     </form>
   </div>
+
+  <div id="edit-form">
+    <form name="edit-form" action="">
+      <div id="option-head">
+        <label><input type="radio" id="edit-local-host" name="host-type" value="1" checked="checked">&nbsp;本地方案</label>
+      </div>
+
+      <div class="host-name">
+        <label for="host-name">方案名 : </label>
+        <input type="text" name="host-name" id="new-host-name">
+      </div>
+
+      <div class="btn">
+        <input type="button" class="form-btn" id="edit-ok-btn" name="ok-btn" value="OK">
+        <input type="button" class="form-btn" id="edit-cancel-btn" name="cancel-btn" value="cancel">
+      </div>
+    </form>
+  </div>
   <script src="./js/switchhosts.js" charset="utf-8"></script>
   <script src="./js/app.js" charset="utf-8"></script>
   <script type="text/javascript">

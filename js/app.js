@@ -264,10 +264,41 @@ function addHost()
   }
 }
 
+function saveHost()
+{
+  if ($('#new-host-name').val().length != 0) {
+    var fs = require('fs'),
+      node_id = $('.active-li').attr('id');
+    var hostData = fs.readFileSync('./hostList.json'),
+      hostList = JSON.parse(hostData);
+
+    $.each(hostList, function(idx, obj) {
+      if (obj.id == node_id) {
+        obj.name = $('#new-host-name').val();
+      }
+    });
+
+    fs.writeFile('./hostList.json', JSON.stringify(hostList), function(err) {
+      if (err)
+        return console.error(err);
+      SwitchHosts.start();
+      $('#bg').hide();
+      $('#edit-form').hide();
+    });
+  }
+}
+
 function bindOkBtn()
 {
   $('#ok-btn').on('click', function() {
     addHost();
+  });
+}
+
+function bindEditOkBtn()
+{
+  $('#edit-ok-btn').on('click', function() {
+    saveHost();
   });
 }
 
@@ -276,6 +307,11 @@ function bindEnterBtn()
   $('#add-form').keydown(function(event) {
     if (event.which == 13) {
       addHost();
+    }
+  });
+  $('#edit-form').keydown(function(event) {
+    if (event.which == 13) {
+      saveHost();
     }
   });
 }
@@ -288,11 +324,33 @@ $('#add-btn').on('click', function() {
 });
 
 $('#refresh-btn').on('click', function() {
+  console.log('refreshing...');
   SwitchHosts.start();
 });
 
 $('#edit-btn').on('click', function() {
-  alert('click edit');
+  if ($('.active-li').length != 0) {
+    var cur_node = $('.active-li'),
+      node_id = $('.active-li').attr('id');
+    if (node_id != 'public-host' && node_id != 'current-host') {
+      var fs = require('fs');
+      var hostData = fs.readFileSync('./hostList.json'),
+        hostList = JSON.parse(hostData);
+        var node_name = '';
+        $.each(hostList, function(idx, obj) {
+          if (obj.id == node_id) {
+            node_name = obj.name;
+          }
+        });
+        if (node_name != '') {
+          $('#new-host-name').val(node_name);
+          $('#bg').show();
+          $('#edit-form').show();
+          bindEditOkBtn();
+          bindEnterBtn();
+        }
+    }
+  }
 });
 
 $('#del-btn').on('click', function() {
@@ -329,6 +387,11 @@ $('#del-btn').on('click', function() {
 $('#cancel-btn').on('click', function() {
   $('#bg').hide();
   $('#add-form').hide();
+});
+
+$('#edit-cancel-btn').on('click', function() {
+  $('#bg').hide();
+  $('#edit-form').hide();
 });
 
 $('#bg').on('click', function() {

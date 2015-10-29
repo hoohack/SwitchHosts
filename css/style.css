@@ -179,3 +179,7 @@ body {
   display: inline-block;
   width: 35%;
 }
+
+.gray {
+  -webkit-filter: grayscale(100%);
+}

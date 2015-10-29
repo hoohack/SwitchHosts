@@ -65,6 +65,30 @@ function updateIcon(node_id, icon)
 
 }
 
+function clearGray()
+{
+  if ($('.gray').length != 0)
+  {
+    $('.gray').removeClass('gray');
+  }
+}
+
+function disableBtn(btn)
+{
+  if (!btn.hasClass('gray'))
+  {
+    btn.addClass('gray');
+  }
+}
+
+function enableBtn(btn)
+{
+  if (btn.attr('class').indexOf('gray') != -1)
+  {
+    btn.removeClass('gray');
+  }
+}
+
 function acceptHosts(node)
 {
   if ($('.accept')) {
@@ -105,21 +129,27 @@ function acceptHosts(node)
 }
 
 $('#public-host').click(function() {
+  clearGray();
   setActiveLi($(this));
 
   var fs = require('fs'),
     input = fs.createReadStream('./resources/texts/public_host.txt');
   readLines(input);
   $('#edit-area').attr('contenteditable', true);
+  disableBtn($('#del-btn'));
+  disableBtn($('#edit-btn'));
 });
 
 $('#current-host').click(function() {
+  clearGray();
   setActiveLi($(this));
 
   var fs = require('fs'),
     input = fs.createReadStream('/etc/hosts');
   readLines(input);
   $('#edit-area').attr('contenteditable', false);
+  disableBtn($('#del-btn'));
+  disableBtn($('#edit-btn'));
 });
 
 $('#root-minus').click(function() {

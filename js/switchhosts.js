@@ -122,6 +122,7 @@ var SwitchHosts = (function() {
     if (local_host_list.length != 0) {
       local_host_list.click(function() {
         var node = $(this).attr('id');
+        clearGray();
         setActiveLi($(this));
 
         var fs = require('fs'),

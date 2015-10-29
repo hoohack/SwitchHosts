@@ -15,13 +15,13 @@
           <ul>
             <li id="root-tree">
               <i class="fa fa-minus-square-o" id="root-minus"></i>&nbsp;<i class="fa fa-folder"></i>&nbsp;<span class="tree-title">hosts</span>
-              <ul>
-                <li class="second-tree" id="public-host">
+              <ul id="default-list">
+                <!-- <li class="second-tree default-node" id="public-host">
                   <img src="./resources/images/icon_0.png" /><span class="tree-title">公用hosts</span>
                 </li>
-                <li class="second-tree" id="current-host">
+                <li class="second-tree default-node" id="current-host">
                   <img src="./resources/images/icon_0.png" /><span class="tree-title">当前hosts</span>
-                </li>
+                </li> -->
                 <li class="second-tree">
                   <i class="fa fa-minus-square-o minus-folder"></i>&nbsp;<i class="fa fa-folder"></i>&nbsp;<span class="tree-title">本地方案</span>
                   <ul id="local-host-list"></ul>
@@ -95,135 +95,6 @@
   $(function() {
     SwitchHosts.start();
   });
-  $(function() {
-      $.contextMenu({
-          selector: '.leaf-node',
-          items: {
-              "switch": {
-                name: "切换到当前hosts",
-                callback: function(key, options) {
-                  var node_id = $('.active-li').attr('id');
-                  var node = $('#' + node_id);
-                  acceptHosts(node);
-                }
-              },
-              "edit": {
-                name: "编辑",
-                callback: function(key, options) {
-                  editHosts();
-                }
-              },
-              "refresh": {
-                name: "刷新",
-                callback: function(key, options) {
-                  var node_id = $('.active-li').attr('id');
-                  var node = $('#' + node_id);
-                  setActiveLi(node);
-
-                  var fs = require('fs'),
-                    input = fs.createReadStream('./resources/texts/' + node_id + '_host.txt');
-                  readLines(input);
-                  $('#edit-area').attr('contenteditable', true);
-                }
-              },
-              "delete": {
-                name: "删除",
-                callback: function(key, options) {
-                  delHosts();
-                }
-              },
-              "icon": {
-                "name": "图标",
-                "items": {
-                    "图标0": {
-                      "name": "图标0",
-                      "icon": function() {
-                        return 'context-menu-icon context-menu-icon-icon_0'
-                      },
-                      callback: function(key, options) {
-                        var node_id = $('.active-li').attr('id');
-                        var node = $('#' + node_id);
-                        updateIcon(node_id, 'icon_0');
-                      }
-                    },
-                    "图标1": {
-                      "name": "图标1",
-                      "icon": function() {
-                        return 'context-menu-icon context-menu-icon-icon_1'
-                      },
-                      callback: function(key, options) {
-                        var node_id = $('.active-li').attr('id');
-                        var node = $('#' + node_id);
-                        updateIcon(node_id, 'icon_1');
-                      }
-                    },
-                    "图标2": {
-                      "name": "图标2",
-                      "icon": function() {
-                        return 'context-menu-icon context-menu-icon-icon_2'
-                      },
-                      callback: function(key, options) {
-                        var node_id = $('.active-li').attr('id');
-                        var node = $('#' + node_id);
-                        updateIcon(node_id, 'icon_2');
-                      }
-                    },
-                    "图标3": {
-                      "name": "图标3",
-                      "icon": function() {
-                        return 'context-menu-icon context-menu-icon-icon_3'
-                      },
-                      callback: function(key, options) {
-                        var node_id = $('.active-li').attr('id');
-                        var node = $('#' + node_id);
-                        updateIcon(node_id, 'icon_3');
-                      }
-                    },
-                    "图标4": {
-                      "name": "图标4",
-                      "icon": function() {
-                        return 'context-menu-icon context-menu-icon-icon_4'
-                      },
-                      callback: function(key, options) {
-                        var node_id = $('.active-li').attr('id');
-                        var node = $('#' + node_id);
-                        updateIcon(node_id, 'icon_4');
-                      }
-                    },
-                    "图标5": {
-                      "name": "图标5",
-                      "icon": function() {
-                        return 'context-menu-icon context-menu-icon-icon_5'
-                      },
-                      callback: function(key, options) {
-                        var node_id = $('.active-li').attr('id');
-                        var node = $('#' + node_id);
-                        updateIcon(node_id, 'icon_5');
-                      }
-                    },
-                    "图标6": {
-                      "name": "图标6",
-                      "icon": function() {
-                        return 'context-menu-icon context-menu-icon-icon_6'
-                      },
-                      callback: function(key, options) {
-                        var node_id = $('.active-li').attr('id');
-                        var node = $('#' + node_id);
-                        updateIcon(node_id, 'icon_6');
-                      }
-                    }
-                }
-              }
-          }
-      });
-      // $('.context-menu-icon').on('click', function(e) {
-      //   var class_name = $(this).attr('class');
-      //   var reg = /(icon_)(\d+)/g;
-      //   var result = reg.exec(class_name);
-      //   var node_id = $('.active-li').attr('id');
-      //   updateIcon(node_id, 'icon_' + result[2]);
-      // });
-    });
   </script>
 </body>
 </html>

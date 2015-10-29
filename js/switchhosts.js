@@ -1,5 +1,6 @@
 var SwitchHosts = (function() {
-  var $localHostList = $('#local-host-list');
+  var $localHostList = $('#local-host-list'),
+    $defaultHostList = $('#default-list');
   var hostList;
 
   function addMenu()
@@ -59,12 +60,52 @@ var SwitchHosts = (function() {
     win.menu = menubar;
   }
 
+  function bindDefaultClick()
+  {
+    $('#public-host').click(function() {
+      clearGray();
+      setActiveLi($(this));
+
+      var fs = require('fs'),
+        input = fs.createReadStream('./resources/texts/public_host.txt');
+      readLines(input);
+      $('#edit-area').attr('contenteditable', true);
+      disableBtn($('#del-btn'));
+      disableBtn($('#edit-btn'));
+    });
+
+    $('#current-host').click(function() {
+      clearGray();
+      setActiveLi($(this));
+
+      var fs = require('fs'),
+        input = fs.createReadStream('/etc/hosts');
+      readLines(input);
+      $('#edit-area').attr('contenteditable', false);
+      disableBtn($('#del-btn'));
+      disableBtn($('#edit-btn'));
+    });
+  }
+
   function start()
   {
     addMenu();
+    if ($('.default-node').length == 2) {
+      $('#default-list li').first().remove();
+      $('#default-list li').first().remove();
+    }
+    loadDefaultList();
+    bindDefaultClick();
     $localHostList.empty();
     loadHostList();
     bindClick();
+    console.log($('.context-menu-list').length);
+    if ($('.context-menu-list').length != 0)
+    {
+      $('.context-menu-list').remove();
+      console.log($('.context-menu-list').length);
+    }
+    addRightBtnClick();
   }
 
   function initHostList()
@@ -84,6 +125,29 @@ var SwitchHosts = (function() {
       }
     ];
     return cfg;
+  }
+
+  function loadDefaultList()
+  {
+    var fs = require('fs');
+    var data = fs.readFileSync('./defaultList.json'),
+      defaultHostList = JSON.parse(data);
+
+    $.each(defaultHostList, function(idx, obj) {
+      if ($('#' + obj.id).length == 0) {
+        var new_node = $('<li></li>'),
+          node_span = $('<span></span>'),
+          node_img = $('<img>');
+        node_span.html(obj.name);
+        new_node.attr('id', obj.id);
+        new_node.addClass('second-tree');
+        new_node.addClass('default-node');
+        node_img.attr('src', "./resources/images/" + obj.img_name);
+        new_node.append(node_img);
+        new_node.append(node_span);
+        $defaultHostList.prepend(new_node);
+      }
+    });
   }
 
   function loadHostList()

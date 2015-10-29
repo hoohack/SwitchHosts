@@ -258,7 +258,7 @@
             // contextmenu show dispatcher
             contextmenu: function (e) {
                 var $this = $(this);
-                setActiveLi($(this));
+                // setActiveLi($(this));
                 // disable actual context-menu if we are using the right mouse button as the trigger
                 if (e.data.trigger === 'right') {
                     e.preventDefault();

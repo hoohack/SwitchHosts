@@ -46,6 +46,25 @@ function addMinus(n_ul, node)
   node.addClass('fa-minus-square-o');
 }
 
+function updateDefaultIcon(node_id, icon)
+{
+  var fs = require('fs');
+  var data = fs.readFileSync('./defaultList.json'),
+    hostList = JSON.parse(data);
+  $.each(hostList, function(idx, obj) {
+    if (obj.id == node_id) {
+      obj.img_name = icon + '.png';
+    }
+  });
+
+  fs.writeFile('./defaultList.json', JSON.stringify(hostList), function(err) {
+    if (err)
+      return console.error(err);
+    SwitchHosts.start();
+  });
+
+}
+
 function updateIcon(node_id, icon)
 {
   var fs = require('fs');
@@ -127,30 +146,6 @@ function acceptHosts(node)
   });
   $('#edit-area').attr('contenteditable', true);
 }
-
-$('#public-host').click(function() {
-  clearGray();
-  setActiveLi($(this));
-
-  var fs = require('fs'),
-    input = fs.createReadStream('./resources/texts/public_host.txt');
-  readLines(input);
-  $('#edit-area').attr('contenteditable', true);
-  disableBtn($('#del-btn'));
-  disableBtn($('#edit-btn'));
-});
-
-$('#current-host').click(function() {
-  clearGray();
-  setActiveLi($(this));
-
-  var fs = require('fs'),
-    input = fs.createReadStream('/etc/hosts');
-  readLines(input);
-  $('#edit-area').attr('contenteditable', false);
-  disableBtn($('#del-btn'));
-  disableBtn($('#edit-btn'));
-});
 
 $('#root-minus').click(function() {
   var next_ul = $(this).parent().find('ul');
@@ -390,6 +385,228 @@ function delHosts()
         }
     }
   }
+}
+
+function addRightBtnClick()
+{
+  $.contextMenu({
+      selector: '.leaf-node',
+      items: {
+          "switch": {
+            name: "切换到当前hosts",
+            callback: function(key, options) {
+              var node_id = $('.active-li').attr('id');
+              var node = $('#' + node_id);
+              acceptHosts(node);
+            }
+          },
+          "edit": {
+            name: "编辑",
+            callback: function(key, options) {
+              editHosts();
+            }
+          },
+          "refresh": {
+            name: "刷新",
+            callback: function(key, options) {
+              var node_id = $('.active-li').attr('id');
+              var node = $('#' + node_id);
+              setActiveLi(node);
+
+              var fs = require('fs'),
+                input = fs.createReadStream('./resources/texts/' + node_id + '_host.txt');
+              readLines(input);
+              $('#edit-area').attr('contenteditable', true);
+            }
+          },
+          "delete": {
+            name: "删除",
+            callback: function(key, options) {
+              delHosts();
+            }
+          },
+          "icon": {
+            "name": "图标",
+            "items": {
+                "图标0": {
+                  "name": "图标0",
+                  "icon": function() {
+                    return 'context-menu-icon context-menu-icon-icon_0'
+                  },
+                  callback: function(key, options) {
+                    var node_id = $('.active-li').attr('id');
+                    var node = $('#' + node_id);
+                    updateIcon(node_id, 'icon_0');
+                  }
+                },
+                "图标1": {
+                  "name": "图标1",
+                  "icon": function() {
+                    return 'context-menu-icon context-menu-icon-icon_1'
+                  },
+                  callback: function(key, options) {
+                    var node_id = $('.active-li').attr('id');
+                    var node = $('#' + node_id);
+                    updateIcon(node_id, 'icon_1');
+                  }
+                },
+                "图标2": {
+                  "name": "图标2",
+                  "icon": function() {
+                    return 'context-menu-icon context-menu-icon-icon_2'
+                  },
+                  callback: function(key, options) {
+                    var node_id = $('.active-li').attr('id');
+                    var node = $('#' + node_id);
+                    updateIcon(node_id, 'icon_2');
+                  }
+                },
+                "图标3": {
+                  "name": "图标3",
+                  "icon": function() {
+                    return 'context-menu-icon context-menu-icon-icon_3'
+                  },
+                  callback: function(key, options) {
+                    var node_id = $('.active-li').attr('id');
+                    var node = $('#' + node_id);
+                    updateIcon(node_id, 'icon_3');
+                  }
+                },
+                "图标4": {
+                  "name": "图标4",
+                  "icon": function() {
+                    return 'context-menu-icon context-menu-icon-icon_4'
+                  },
+                  callback: function(key, options) {
+                    var node_id = $('.active-li').attr('id');
+                    var node = $('#' + node_id);
+                    updateIcon(node_id, 'icon_4');
+                  }
+                },
+                "图标5": {
+                  "name": "图标5",
+                  "icon": function() {
+                    return 'context-menu-icon context-menu-icon-icon_5'
+                  },
+                  callback: function(key, options) {
+                    var node_id = $('.active-li').attr('id');
+                    var node = $('#' + node_id);
+                    updateIcon(node_id, 'icon_5');
+                  }
+                },
+                "图标6": {
+                  "name": "图标6",
+                  "icon": function() {
+                    return 'context-menu-icon context-menu-icon-icon_6'
+                  },
+                  callback: function(key, options) {
+                    var node_id = $('.active-li').attr('id');
+                    var node = $('#' + node_id);
+                    updateIcon(node_id, 'icon_6');
+                  }
+                }
+            }
+          }
+      }
+  });
+  $.contextMenu({
+      selector: '.default-node',
+      items: {
+          "switch": {
+            name: "切换到当前hosts",
+            disabled: true
+          },
+          "edit": {
+            name: "编辑",
+            disabled: true
+          },
+          "refresh": {
+            name: "刷新",
+            callback: function(key, options) {
+              var node_id = $('.active-li').attr('id');
+              var node = $('#' + node_id);
+              setActiveLi(node);
+
+              var fs = require('fs'),
+                input = fs.createReadStream('./resources/texts/' + node_id + '_host.txt');
+              readLines(input);
+              $('#edit-area').attr('contenteditable', true);
+            }
+          },
+          "delete": {
+            name: "删除",
+            disabled: true
+          },
+          "icon": {
+            "name": "图标",
+            "items": {
+                "图标0": {
+                  "name": "图标0",
+                  "icon": function() {
+                    return 'context-menu-icon context-menu-icon-icon_0'
+                  },
+                  callback: function(key, options) {
+                    updateDefaultIcon($(this).attr('id'), 'icon_0');
+                  }
+                },
+                "图标1": {
+                  "name": "图标1",
+                  "icon": function() {
+                    return 'context-menu-icon context-menu-icon-icon_1'
+                  },
+                  callback: function(key, options) {
+                    updateDefaultIcon($(this).attr('id'), 'icon_1');
+                  }
+                },
+                "图标2": {
+                  "name": "图标2",
+                  "icon": function() {
+                    return 'context-menu-icon context-menu-icon-icon_2'
+                  },
+                  callback: function(key, options) {
+                    updateDefaultIcon($(this).attr('id'), 'icon_2');
+                  }
+                },
+                "图标3": {
+                  "name": "图标3",
+                  "icon": function() {
+                    return 'context-menu-icon context-menu-icon-icon_3'
+                  },
+                  callback: function(key, options) {
+                    updateDefaultIcon($(this).attr('id'), 'icon_3');
+                  }
+                },
+                "图标4": {
+                  "name": "图标4",
+                  "icon": function() {
+                    return 'context-menu-icon context-menu-icon-icon_4'
+                  },
+                  callback: function(key, options) {
+                    updateDefaultIcon($(this).attr('id'), 'icon_4');
+                  }
+                },
+                "图标5": {
+                  "name": "图标5",
+                  "icon": function() {
+                    return 'context-menu-icon context-menu-icon-icon_5'
+                  },
+                  callback: function(key, options) {
+                    updateDefaultIcon($(this).attr('id'), 'icon_5');
+                  }
+                },
+                "图标6": {
+                  "name": "图标6",
+                  "icon": function() {
+                    return 'context-menu-icon context-menu-icon-icon_6'
+                  },
+                  callback: function(key, options) {
+                    updateDefaultIcon($(this).attr('id'), 'icon_6');
+                  }
+                }
+            }
+          }
+      }
+  });
 }
 
 $('#add-btn').on('click', function() {

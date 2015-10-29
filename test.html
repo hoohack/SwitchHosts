@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title></title>
+    <link rel="stylesheet" href="./css/jquery.contextMenu.css" media="screen" title="no title" charset="utf-8">
+    <script src="./js/jquery-2.1.4.min.js" charset="utf-8"></script>
+    <script src="./js/jquery.ui.position.min.js" charset="utf-8"></script>
+    <script src="./js/jquery.contextMenu.js" charset="utf-8"></script>
+  </head>
+  <body>
+    <ul id="local-host-list">
+      <li class="leaf-node">呵呵</li>
+    </ul>
+  <script type="text/javascript">
+  $(function() {
+    $.contextMenu({
+        selector: '.leaf-node',
+        callback: function(key, options) {
+            var m = "clicked: " + key;
+            console.log(options);
+            window.console && console.log(m) || alert(m);
+        },
+        items: {
+            "switch": {
+              name: "切换到当前hosts",
+              callback: function(key, options) {
+                var node_id = $('.active-li').attr('id');
+                var node = $('#' + node_id);
+                acceptHosts(node);
+              }
+            },
+            "edit": {
+              name: "编辑",
+              callback: function(key, options) {
+                editHosts();
+              }
+            },
+            "refresh": {
+              name: "刷新",
+              callback: function(key, options) {
+                var node_id = $('.active-li').attr('id');
+                var node = $('#' + node_id);
+                setActiveLi(node);
+
+                var fs = require('fs'),
+                  input = fs.createReadStream('./resources/texts/' + node_id + '_host.txt');
+                readLines(input);
+                $('#edit-area').attr('contenteditable', true);
+              }
+            },
+            "delete": {
+              name: "删除",
+              callback: function(key, options) {
+                delHosts();
+              }
+            },
+            "icon": {
+              "name": "图标",
+              "items": {
+                  "图标0": {
+                    "name": "图标0",
+                    icon: function() {
+                      return 'context-menu-icon context-menu-icon-icon_0'
+                    }
+                  },
+                  "图标1": {
+                    "name": "图标1",
+                    "icon": "icon_1"
+                  },
+                  "图标2": {
+                    "name": "图标2",
+                    "icon": "icon_2"
+                  },
+                  "图标3": {
+                    "name": "图标3",
+                    "icon": "icon_3"
+                  },
+                  "图标4": {
+                    "name": "图标4",
+                    "icon": "icon_4"
+                  },
+                  "图标5": {
+                    "name": "图标5",
+                    "icon": "icon_5"
+                  },
+                  "图标6": {
+                    "name": "图标6",
+                    "icon": "icon_6"
+                  }
+              }
+            }
+        }
+    });
+      // $('.context-menu-icon').on('click', function(e) {
+      //   var class_name = $(this).attr('class');
+      //   var reg = /(icon_)(\d+)/g;
+      //   var result = reg.exec(class_name);
+      //   var node_id = $('.active-li').attr('id');
+      //   // updateIcon(node_id, 'icon_' + result[2]);
+      // });
+    });
+  </script>
+  </body>
+</html>

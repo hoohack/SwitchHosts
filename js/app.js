@@ -8,7 +8,8 @@ function setActiveLi(node)
 
 function readLines(input) {
   var remaining = '',
-    flag = false;
+    flag = false,
+    result = '';
   input.on('data', function(data) {
     remaining += data;
     flag = true;
@@ -45,11 +46,68 @@ function addMinus(n_ul, node)
   node.addClass('fa-minus-square-o');
 }
 
+function updateIcon(node_id, icon)
+{
+  var fs = require('fs');
+  var data = fs.readFileSync('./hostList.json'),
+    hostList = JSON.parse(data);
+  $.each(hostList, function(idx, obj) {
+    if (obj.id == node_id) {
+      obj.img_name = icon + '.png';
+    }
+  });
+
+  fs.writeFile('./hostList.json', JSON.stringify(hostList), function(err) {
+    if (err)
+      return console.error(err);
+    SwitchHosts.start();
+  });
+
+}
+
+function acceptHosts(node)
+{
+  if ($('.accept')) {
+    $('.accept').removeClass('accept');
+  }
+  node.addClass('accept');
+  var class_name = node.attr('id');
+
+
+  var fs = require('fs');
+  var readStream = fs.createReadStream('./resources/texts/public_host.txt');
+  var writeStream = fs.createWriteStream('/etc/hosts');
+
+  readStream.on('data', function(chunk) { // 当有数据流出时，写入数据
+      if (writeStream.write(chunk) === false) { // 如果没有写完，暂停读取流
+          readStream.pause();
+      }
+  });
+
+  writeStream.on('drain', function() { // 写完后，继续读取
+      readStream.resume();
+  });
+  var hostReadStream = fs.createReadStream('./resources/texts/' + class_name + '_host.txt');
+  hostReadStream.on('data', function(chunk) {
+    if (writeStream.write(chunk) == false) {
+      hostReadStream.pause();
+    }
+  });
+
+  writeStream.on('drain', function() { // 写完后，继续读取
+      hostReadStream.resume();
+  });
+
+  hostReadStream.on('end', function() {
+    writeStream.end();
+  });
+  $('#edit-area').attr('contenteditable', true);
+}
+
 $('#public-host').click(function() {
   setActiveLi($(this));
 
-  var result = '',
-    fs = require('fs'),
+  var fs = require('fs'),
     input = fs.createReadStream('./resources/texts/public_host.txt');
   readLines(input);
   $('#edit-area').attr('contenteditable', true);
@@ -58,8 +116,7 @@ $('#public-host').click(function() {
 $('#current-host').click(function() {
   setActiveLi($(this));
 
-  var result = '',
-    fs = require('fs'),
+  var fs = require('fs'),
     input = fs.createReadStream('/etc/hosts');
   readLines(input);
   $('#edit-area').attr('contenteditable', false);
@@ -247,19 +304,8 @@ function bindEnterBtn()
   });
 }
 
-$('#add-btn').on('click', function() {
-  $('#bg').show();
-  $('#add-form').show();
-  bindOkBtn();
-  bindEnterBtn();
-});
-
-$('#refresh-btn').on('click', function() {
-  console.log('refreshing...');
-  SwitchHosts.start();
-});
-
-$('#edit-btn').on('click', function() {
+function editHosts()
+{
   if ($('.active-li').length != 0) {
     var cur_node = $('.active-li'),
       node_id = $('.active-li').attr('id');
@@ -282,9 +328,10 @@ $('#edit-btn').on('click', function() {
         }
     }
   }
-});
+}
 
-$('#del-btn').on('click', function() {
+function delHosts()
+{
   if ($('.active-li').length != 0) {
     var cur_node = $('.active-li'),
       node_id = $('.active-li').attr('id');
@@ -313,6 +360,26 @@ $('#del-btn').on('click', function() {
         }
     }
   }
+}
+
+$('#add-btn').on('click', function() {
+  $('#bg').show();
+  $('#add-form').show();
+  bindOkBtn();
+  bindEnterBtn();
+});
+
+$('#refresh-btn').on('click', function() {
+  console.log('refreshing...');
+  SwitchHosts.start();
+});
+
+$('#edit-btn').on('click', function() {
+  editHosts();
+});
+
+$('#del-btn').on('click', function() {
+  delHosts();
 });
 
 $('#cancel-btn').on('click', function() {
@@ -328,4 +395,12 @@ $('#edit-cancel-btn').on('click', function() {
 $('#bg').on('click', function() {
   $('#bg').hide();
   $('#add-form').hide();
+});
+
+$('#accept-btn').on('click', function() {
+  var node_id = $('.active-li').attr('id');
+  if (node_id != 'public-host' && node_id != 'current-host') {
+    var node = $('#' + node_id);
+    acceptHosts(node);
+  }
 });

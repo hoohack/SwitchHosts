@@ -99,12 +99,6 @@ var SwitchHosts = (function() {
     $localHostList.empty();
     loadHostList();
     bindClick();
-    console.log($('.context-menu-list').length);
-    if ($('.context-menu-list').length != 0)
-    {
-      $('.context-menu-list').remove();
-      console.log($('.context-menu-list').length);
-    }
     addRightBtnClick();
   }
 

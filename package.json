@@ -8,7 +8,8 @@
 			"title" : "SwitchHosts",
 			"max-height" : 807,
 			"max-width" : 607,
-			"resizable" : false
+			"resizable" : false,
+			"icon": "./resources/images/icon_0.png"
 	},
 	"version" : "0.1.0",
 	"show_in_tackbar" : "true",

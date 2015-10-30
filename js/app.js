@@ -1,3 +1,13 @@
+var gui = require('nw.gui');
+var path = require('path');
+var mkdirp = require('mkdirp');
+var dataPath = gui.App.dataPath,
+  cfgPath = path.join(dataPath, "/config"),
+  hostPath = path.join(dataPath, "/host");
+
+var $localHostList = $('#local-host-list'),
+  $defaultHostList = $('#default-list');
+
 function setActiveLi(node)
 {
   if ($('.active-li')) {
@@ -49,7 +59,7 @@ function addMinus(n_ul, node)
 function updateDefaultIcon(node_id, icon)
 {
   var fs = require('fs');
-  var data = fs.readFileSync('./defaultList.json'),
+  var data = fs.readFileSync(cfgPath + '/defaultList.json'),
     hostList = JSON.parse(data);
   $.each(hostList, function(idx, obj) {
     if (obj.id == node_id) {
@@ -57,31 +67,22 @@ function updateDefaultIcon(node_id, icon)
     }
   });
 
-  fs.writeFile('./defaultList.json', JSON.stringify(hostList), function(err) {
-    if (err)
-      return console.error(err);
-    SwitchHosts.start();
-  });
-
+  writeConfigFile('defaultList.json', hostList);
+  $('#' + node_id +' img').attr('src', './resources/images/' + icon + '.png');
 }
 
 function updateIcon(node_id, icon)
 {
   var fs = require('fs');
-  var data = fs.readFileSync('./hostList.json'),
+  var data = fs.readFileSync(cfgPath + '/hostList.json'),
     hostList = JSON.parse(data);
   $.each(hostList, function(idx, obj) {
     if (obj.id == node_id) {
       obj.img_name = icon + '.png';
     }
   });
-
-  fs.writeFile('./hostList.json', JSON.stringify(hostList), function(err) {
-    if (err)
-      return console.error(err);
-    SwitchHosts.start();
-  });
-
+  writeConfigFile('hostList.json', hostList);
+  $('#' + node_id +' img').attr('src', './resources/images/' + icon + '.png');
 }
 
 function clearGray()
@@ -118,7 +119,7 @@ function acceptHosts(node)
 
 
   var fs = require('fs');
-  var readStream = fs.createReadStream('./resources/texts/public_host.txt');
+  var readStream = fs.createReadStream(hostPath + '/public');
   var writeStream = fs.createWriteStream('/etc/hosts');
 
   readStream.on('data', function(chunk) { // 当有数据流出时，写入数据
@@ -130,7 +131,7 @@ function acceptHosts(node)
   writeStream.on('drain', function() { // 写完后，继续读取
       readStream.resume();
   });
-  var hostReadStream = fs.createReadStream('./resources/texts/' + class_name + '_host.txt');
+  var hostReadStream = fs.createReadStream(hostPath + '/' + class_name);
   hostReadStream.on('data', function(chunk) {
     if (writeStream.write(chunk) == false) {
       hostReadStream.pause();
@@ -231,7 +232,7 @@ $('#edit-area').keydown(function(event) {
       html_str += "<br>";
     }
     var data = filterTag(html_str);
-    var writerStream = fs.createWriteStream('./resources/texts/' + file_name_prefix + '_host.txt');
+    var writerStream = fs.createWriteStream(hostPath + '/' + file_name_prefix);
     writerStream.write(data, 'UTF8');
     writerStream.end();
 
@@ -247,33 +248,158 @@ $('#edit-area').keydown(function(event) {
     return false;
 });
 
+function initHostList()
+{
+  var cfg = [
+    {"id" : "node1","name" : "外网开发","active" : false,"img_name" : "icon_1.png"},
+    {"id" : "node2","name" : "什么都没有","active" : false,"img_name" : "icon_2.png"}
+  ];
+  return cfg;
+}
+
+function initDefaultList()
+{
+  var cfg = [
+    {"id":"current-host","name":"当前hosts","active":true,"img_name":"icon_6.png"},
+    {"id":"public-host","name":"公用hosts","active":false,"img_name":"icon_0.png"}
+  ];
+  return cfg;
+}
+
+function readDefaultList()
+{
+    var fs = require('fs');
+    var cfg = {};
+    if (!fs.existsSync(cfgPath))
+    {
+        console.log(cfgPath + " is not found");
+        fs.mkdir(cfgPath);
+        cfg = initDefaultList();
+        writeConfigFile("defaultList.json", cfg);
+    }
+    else
+    {
+        if(!fs.existsSync(cfgPath + '/defaultList.json'))
+        {
+            console.log(cfgPath+'/defaultList.json'+" is not found");
+            cfg = initDefaultList();
+            writeConfigFile("defaultList.json", cfg);
+        }
+        else
+        {
+            var data = fs.readFileSync(cfgPath+'/defaultList.json');
+            try {
+              cfg = JSON.parse(data);
+            } catch(e) {
+              cfg = initDefaultList();
+            }
+        }
+    }
+    $.each(cfg, function(idx, obj) {
+      if (obj.id == 'public-host')
+      {
+        writeDefaultFile('public', "# 这里是公用host\n");
+      }
+    });
+    return cfg;
+}
+
+function readHostList()
+{
+    var fs = require('fs');
+    var cfg = {};
+    if (!fs.existsSync(cfgPath))
+    {
+        console.log(cfgPath + " is not found");
+        fs.mkdir(cfgPath);
+        cfg = initHostList();
+        writeConfigFile("hostList.json", cfg);
+    }
+    else
+    {
+        if(!fs.existsSync(cfgPath + '/hostList.json'))
+        {
+            console.log(cfgPath+'/hostList.json' + " is not found");
+            cfg = initHostList();
+            writeConfigFile("hostList.json", cfg);
+        }
+        else
+        {
+            var data = fs.readFileSync(cfgPath+'/hostList.json');
+            try {
+              cfg = JSON.parse(data);
+            } catch(e) {
+              cfg = initHostList();
+            }
+        }
+    }
+    $.each(cfg, function(idx, obj) {
+      writeDefaultFile(obj.id, "# 这里是" + obj.name + "\n");
+    });
+    return cfg;
+}
+
+function writeConfigFile(file_name, hostList)
+{
+  var fs = require('fs');
+  var file_path = cfgPath + '/' + file_name;
+  mkdirp.sync(cfgPath, function (err) {
+      if (err) console.error(err)
+      else console.log("Making directory: "+cfgPath);
+  });
+  fs.writeFile(file_path, JSON.stringify(hostList));
+}
+
+function writeDefaultFile(file_name, content)
+{
+  var fs = require('fs');
+  var file_path = hostPath + '/' + file_name;
+  if (!fs.existsSync(file_path))
+  {
+    mkdirp.sync(hostPath, function (err) {
+        if (err) console.error(err)
+        else console.log("Making directory: "+hostPath);
+    });
+    fs.writeFile(file_path, content);
+  }
+}
+
+function addNode(node_id, node_text, img_name, active)
+{
+    var new_node = $('<li></li>'),
+      node_span = $('<span></span>'),
+      node_img = $('<img>');
+    node_span.html(node_text);
+    new_node.attr('id', node_id);
+    new_node.addClass('leaf-node');
+    if (active == 1)
+    {
+      new_node.addClass('accept');
+    }
+    node_img.attr('src', "./resources/images/" + img_name);
+    new_node.append(node_img);
+    new_node.append(node_span);
+    $localHostList.append(new_node);
+}
+
 function addHost()
 {
   if ($('#host-name').val().length != 0) {
     var fs = require('fs'),
       pinyin = require("pinyin");
-    var hostData = fs.readFileSync('./hostList.json'),
+    var hostData = fs.readFileSync(cfgPath + '/hostList.json'),
       img_idx = parseInt(Math.random() * 6 + 1),
       hostList = JSON.parse(hostData);
     var host_name = 'node' + (hostList.length+1);
-    var file_name = './resources/texts/' + host_name + '_host.txt';
-    fs.open(file_name, 'w', function(err, fd) {
-       if (err) {
-           return console.error(err);
-       }
-       fs.writeFile(file_name, '#方案 ' + $('#host-name').val() + '\n', function(err) {
-         if (err)
-          return console.error(err);
-          hostList[hostList.length] = {"id" : "node" + (hostList.length+1), "name" : $('#host-name').val(), "active" : false, "img_name" : "icon_" + img_idx + ".png"};
-          fs.writeFile('./hostList.json', JSON.stringify(hostList), function(err) {
-            if (err)
-              return console.error(err);
-            SwitchHosts.start();
-            $('#bg').hide();
-            $('#add-form').hide();
-          });
-       });
-    });
+    var file_name = hostPath + '/' + host_name;
+
+    writeDefaultFile(host_name, "# 这里是" + $('#host-name').val() + "\n");
+    var idx = hostList.length;
+    hostList[idx] = {"id" : "node" + (idx+1), "name" : $('#host-name').val(), "active" : false, "img_name" : "icon_" + img_idx + ".png"};
+    writeConfigFile('hostList.json', hostList);
+    addNode("node" + (idx+1), $('#host-name').val(), "icon_" + img_idx + '.png', false);
+    $('#bg').hide();
+    $('#add-form').hide();
   }
 }
 
@@ -281,23 +407,21 @@ function saveHost()
 {
   if ($('#new-host-name').val().length != 0) {
     var fs = require('fs'),
-      node_id = $('.active-li').attr('id');
-    var hostData = fs.readFileSync('./hostList.json'),
+      node_id = $('.active-li').attr('id'),
+      new_val = $('#new-host-name').val();
+    var hostData = fs.readFileSync(cfgPath + '/hostList.json'),
       hostList = JSON.parse(hostData);
 
     $.each(hostList, function(idx, obj) {
       if (obj.id == node_id) {
-        obj.name = $('#new-host-name').val();
+        obj.name = new_val;
       }
     });
 
-    fs.writeFile('./hostList.json', JSON.stringify(hostList), function(err) {
-      if (err)
-        return console.error(err);
-      SwitchHosts.start();
-      $('#bg').hide();
-      $('#edit-form').hide();
-    });
+    writeConfigFile('hostList.json', hostList);
+    $('#' + node_id + ' span').html(new_val);
+    $('#bg').hide();
+    $('#edit-form').hide();
   }
 }
 
@@ -336,7 +460,7 @@ function editHosts()
       node_id = $('.active-li').attr('id');
     if (node_id != 'public-host' && node_id != 'current-host') {
       var fs = require('fs');
-      var hostData = fs.readFileSync('./hostList.json'),
+      var hostData = fs.readFileSync(cfgPath + '/hostList.json'),
         hostList = JSON.parse(hostData);
         var node_name = '';
         $.each(hostList, function(idx, obj) {
@@ -362,7 +486,7 @@ function delHosts()
       node_id = $('.active-li').attr('id');
     if (node_id != 'public-host' && node_id != 'current-host') {
       var fs = require('fs');
-      var hostData = fs.readFileSync('./hostList.json'),
+      var hostData = fs.readFileSync(cfgPath + '/hostList.json'),
         hostList = JSON.parse(hostData);
         var index = -1;
         $.each(hostList, function(idx, obj) {
@@ -372,15 +496,12 @@ function delHosts()
         });
         if (index != -1) {
           hostList.splice(index, 1);
-          fs.writeFile('./hostList.json', JSON.stringify(hostList), function(err) {
+          writeConfigFile('hostList.json', hostList);
+          $('#' + node_id).remove();
+          fs.unlink(hostPath + '/' + node_id, function (err) {
             if (err)
               return console.error(err);
-            SwitchHosts.start();
-            fs.unlink('./resources/texts/' + node_id + '_host.txt', function (err) {
-              if (err)
-                return console.error(err);
-              console.log("file delete success");
-            });
+            console.log("file delete success");
           });
         }
     }
@@ -414,7 +535,7 @@ function addRightBtnClick()
               setActiveLi(node);
 
               var fs = require('fs'),
-                input = fs.createReadStream('./resources/texts/' + node_id + '_host.txt');
+                input = fs.createReadStream(hostPath + '/' + node_id);
               readLines(input);
               $('#edit-area').attr('contenteditable', true);
             }
@@ -422,7 +543,11 @@ function addRightBtnClick()
           "delete": {
             name: "删除",
             callback: function(key, options) {
-              delHosts();
+              var r = confirm("确定要删除吗？");
+              if (r == true)
+              {
+                delHosts();
+              }
             }
           },
           "icon": {
@@ -617,8 +742,21 @@ $('#add-btn').on('click', function() {
 });
 
 $('#refresh-btn').on('click', function() {
-  console.log('refreshing...');
-  SwitchHosts.start();
+  if ($('.active-li').length != 0)
+  {
+    var node_id = $('.active-li').attr('id');
+    if (node_id != 'public-host' && node_id != 'current-host')
+    {
+      console.log('refreshing...');
+      var fs = require('fs'),
+        input = fs.createReadStream(hostPath + '/' + node_id);
+      readLines(input);
+      $('#edit-area').attr('contenteditable', true);
+    }
+  }
+  else {
+    window.location.reload();
+  }
 });
 
 $('#edit-btn').on('click', function() {
@@ -626,7 +764,11 @@ $('#edit-btn').on('click', function() {
 });
 
 $('#del-btn').on('click', function() {
-  delHosts();
+  var r = confirm("确定要删除吗？");
+  if (r == true)
+  {
+    delHosts();
+  }
 });
 
 $('#cancel-btn').on('click', function() {

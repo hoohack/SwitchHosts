@@ -1,12 +1,13 @@
 var SwitchHosts = (function() {
-  var $localHostList = $('#local-host-list'),
-    $defaultHostList = $('#default-list');
-  var hostList;
+  var hostList = {};
+  var defaultHostList = {};
+
+  defaultHostList = readDefaultList();
+  hostList = readHostList();
 
   function addMenu()
   {
     //设置菜单
-    var gui = require('nw.gui');
     var menubar = new gui.Menu({ type: 'menubar' });
     var sub_file = new gui.Menu();
 
@@ -67,7 +68,7 @@ var SwitchHosts = (function() {
       setActiveLi($(this));
 
       var fs = require('fs'),
-        input = fs.createReadStream('./resources/texts/public_host.txt');
+        input = fs.createReadStream(hostPath + '/public');
       readLines(input);
       $('#edit-area').attr('contenteditable', true);
       disableBtn($('#del-btn'));
@@ -89,8 +90,10 @@ var SwitchHosts = (function() {
 
   function start()
   {
+    console.log('starting...');
     addMenu();
     if ($('.default-node').length == 2) {
+      console.log('excute');
       $('#default-list li').first().remove();
       $('#default-list li').first().remove();
     }
@@ -102,31 +105,8 @@ var SwitchHosts = (function() {
     addRightBtnClick();
   }
 
-  function initHostList()
-  {
-    var cfg = [
-      {
-        "id" : "node1",
-        "name" : "外网开发",
-        "active" : true,
-        "img_name" : "icon_1.png"
-      },
-      {
-        "id" : "node2",
-        "name" : "什么都没有",
-        "active" : false,
-        "img_name" : "icon_2.png"
-      }
-    ];
-    return cfg;
-  }
-
   function loadDefaultList()
   {
-    var fs = require('fs');
-    var data = fs.readFileSync('./defaultList.json'),
-      defaultHostList = JSON.parse(data);
-
     $.each(defaultHostList, function(idx, obj) {
       if ($('#' + obj.id).length == 0) {
         var new_node = $('<li></li>'),
@@ -146,30 +126,9 @@ var SwitchHosts = (function() {
 
   function loadHostList()
   {
-    var fs = require('fs');
-    var data = fs.readFileSync('./hostList.json');
-    try {
-      hostList = JSON.parse(data);
-    } catch(e) {
-      hostList = initHostList();
-    }
-
     $.each(hostList, function(idx, obj) {
       if ($('#' + obj.id).length == 0) {
-        var new_node = $('<li></li>'),
-          node_span = $('<span></span>'),
-          node_img = $('<img>');
-        node_span.html(obj.name);
-        new_node.attr('id', obj.id);
-        new_node.addClass('leaf-node');
-        if (obj.active == 1)
-        {
-          new_node.addClass('accept');
-        }
-        node_img.attr('src', "./resources/images/" + obj.img_name);
-        new_node.append(node_img);
-        new_node.append(node_span);
-        $localHostList.append(new_node);
+        addNode(obj.id, obj.name, obj.img_name, obj.active);
       }
     });
   }
@@ -184,7 +143,7 @@ var SwitchHosts = (function() {
         setActiveLi($(this));
 
         var fs = require('fs'),
-          input = fs.createReadStream('./resources/texts/' + node + '_host.txt');
+          input = fs.createReadStream(hostPath + '/' + node);
         readLines(input);
         $('#edit-area').attr('contenteditable', true);
       });

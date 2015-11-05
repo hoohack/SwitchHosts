@@ -150,6 +150,7 @@ var SwitchHosts = (function() {
 
       local_host_list.dblclick(function() {
         acceptHosts($(this));
+        alert('更换host成功,当前使用的hosts方案是 ' + $(this).find('span').html());
       });
     }
   }

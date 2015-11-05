@@ -412,8 +412,7 @@ function addNode(node_id, node_text, img_name, active)
 function addHost()
 {
   if ($('#host-name').val().length != 0) {
-    var fs = require('fs'),
-      pinyin = require("pinyin");
+    var fs = require('fs');
     var hostData = fs.readFileSync(cfgPath + '/hostList.json'),
       img_idx = parseInt(Math.random() * 6 + 1),
       hostList = JSON.parse(hostData),

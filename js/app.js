@@ -124,26 +124,6 @@ function acceptHosts(node)
   node.addClass('accept');
   var class_name = node.attr('id');
 
-  var fs = require('fs'),
-    html_str = $('#edit-area').html(),
-    file_name_prefix = $('.active-li').attr('id');
-
-  if (html_str.indexOf('<br>') == -1 && html_str.length != 0) {
-    html_str += "<br>";
-  }
-  var data = filterTag(html_str);
-  var writerStream = fs.createWriteStream(hostPath + '/' + file_name_prefix);
-  writerStream.write(data, 'UTF8');
-  writerStream.end();
-
-  writerStream.on('finish', function() {
-      console.log("saved finish");
-  });
-
-  writerStream.on('error', function(err){
-     console.log(err.stack);
-  });
-
   var fs = require('fs');
   var readStream = fs.createReadStream(hostPath + '/public');
   var writeStream = fs.createWriteStream(sysHostPath);
@@ -843,6 +823,16 @@ $('#accept-btn').on('click', function() {
   var node_id = $('.active-li').attr('id');
   if (node_id != 'public-host' && node_id != 'current-host') {
     var node = $('#' + node_id);
+
+    var fs = require('fs'),
+      html_str = $('#edit-area').html(),
+      file_name_prefix = $('.active-li').attr('id');
+
+    if (html_str.indexOf('<br>') == -1 && html_str.length != 0) {
+      html_str += "<br>";
+    }
+    var data = filterTag(html_str);
+    fs.writeFile(hostPath + '/' + file_name_prefix, data);
     acceptHosts(node);
     alert('更换host成功,当前使用的hosts方案是 ' + node.find('span').html());
   }

@@ -1,9 +1,16 @@
 var gui = require('nw.gui');
 var path = require('path');
 var mkdirp = require('mkdirp');
+var os = require('os');
 var dataPath = gui.App.dataPath,
   cfgPath = path.join(dataPath, "/config"),
-  hostPath = path.join(dataPath, "/host");
+  hostPath = path.join(dataPath, "/host"),
+  os_type = os.type();
+var sysHostPath = '/etc/hosts';
+if (os_type == 'Windows_NT')
+{
+  sysHostPath = "C:\\Windows\\System32\\drivers\\etc\\hosts";
+}
 
 var $localHostList = $('#local-host-list'),
   $defaultHostList = $('#default-list');
@@ -120,7 +127,7 @@ function acceptHosts(node)
 
   var fs = require('fs');
   var readStream = fs.createReadStream(hostPath + '/public');
-  var writeStream = fs.createWriteStream('/etc/hosts');
+  var writeStream = fs.createWriteStream(sysHostPath);
 
   readStream.on('data', function(chunk) { // 当有数据流出时，写入数据
       if (writeStream.write(chunk) === false) { // 如果没有写完，暂停读取流

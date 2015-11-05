@@ -80,7 +80,7 @@ var SwitchHosts = (function() {
       setActiveLi($(this));
 
       var fs = require('fs'),
-        input = fs.createReadStream('/etc/hosts');
+        input = fs.createReadStream(sysHostPath);
       readLines(input);
       $('#edit-area').attr('contenteditable', false);
       disableBtn($('#del-btn'));

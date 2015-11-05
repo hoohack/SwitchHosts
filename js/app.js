@@ -172,7 +172,6 @@ function acceptHosts(node)
     writeStream.end();
   });
   $('#edit-area').attr('contenteditable', true);
-  alert('更换host成功,当前使用的hosts方案是 ' + node.find('span').html());
 }
 
 $('#root-minus').click(function() {
@@ -845,5 +844,6 @@ $('#accept-btn').on('click', function() {
   if (node_id != 'public-host' && node_id != 'current-host') {
     var node = $('#' + node_id);
     acceptHosts(node);
+    alert('更换host成功,当前使用的hosts方案是 ' + node.find('span').html());
   }
 });

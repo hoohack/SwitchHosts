@@ -416,7 +416,21 @@ function addHost()
       pinyin = require("pinyin");
     var hostData = fs.readFileSync(cfgPath + '/hostList.json'),
       img_idx = parseInt(Math.random() * 6 + 1),
-      hostList = JSON.parse(hostData);
+      hostList = JSON.parse(hostData),
+      already_have = false;
+
+    $.each(hostList, function(idx, obj) {
+      if (obj.name == $('#host-name').val()) {
+        already_have = true;
+        return;
+      }
+    });
+
+    if (already_have)
+    {
+      alert('已经有名为"' + $('#host-name').val() + '"的方案了');
+      return;
+    }
     var host_name = 'node' + (hostList.length+1);
     var file_name = hostPath + '/' + host_name;
 
@@ -437,7 +451,21 @@ function saveHost()
       node_id = $('.active-li').attr('id'),
       new_val = $('#new-host-name').val();
     var hostData = fs.readFileSync(cfgPath + '/hostList.json'),
-      hostList = JSON.parse(hostData);
+      hostList = JSON.parse(hostData),
+      already_have = false;
+
+    $.each(hostList, function(idx, obj) {
+      if (obj.name == new_val) {
+        already_have = true;
+        return;
+      }
+    });
+
+    if (already_have)
+    {
+      alert('已经有名为"' + new_val + '"的方案了');
+      return;
+    }
 
     $.each(hostList, function(idx, obj) {
       if (obj.id == node_id) {

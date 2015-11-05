@@ -73,6 +73,7 @@ var SwitchHosts = (function() {
       $('#edit-area').attr('contenteditable', true);
       disableBtn($('#del-btn'));
       disableBtn($('#edit-btn'));
+      $('#accept-btn').hide();
     });
 
     $('#current-host').click(function() {
@@ -85,6 +86,7 @@ var SwitchHosts = (function() {
       $('#edit-area').attr('contenteditable', false);
       disableBtn($('#del-btn'));
       disableBtn($('#edit-btn'));
+      $('#accept-btn').hide();
     });
   }
 
@@ -138,6 +140,7 @@ var SwitchHosts = (function() {
     var local_host_list = $('ul#local-host-list').children();
     if (local_host_list.length != 0) {
       local_host_list.click(function() {
+        $('#accept-btn').show();
         var node = $(this).attr('id');
         clearGray();
         setActiveLi($(this));

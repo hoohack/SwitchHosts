@@ -183,3 +183,11 @@ body {
 .gray {
   -webkit-filter: grayscale(100%);
 }
+
+#add-btn, #refresh-btn, #edit-btn, #del-btn {
+  opacity:0.8;
+}
+
+#add-btn:active, #refresh-btn:active, #edit-btn:active, #del-btn:active {
+  opacity: 1;
+}

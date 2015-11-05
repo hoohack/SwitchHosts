@@ -124,6 +124,25 @@ function acceptHosts(node)
   node.addClass('accept');
   var class_name = node.attr('id');
 
+  var fs = require('fs'),
+    html_str = $('#edit-area').html(),
+    file_name_prefix = $('.active-li').attr('id');
+
+  if (html_str.indexOf('<br>') == -1 && html_str.length != 0) {
+    html_str += "<br>";
+  }
+  var data = filterTag(html_str);
+  var writerStream = fs.createWriteStream(hostPath + '/' + file_name_prefix);
+  writerStream.write(data, 'UTF8');
+  writerStream.end();
+
+  writerStream.on('finish', function() {
+      console.log("saved finish");
+  });
+
+  writerStream.on('error', function(err){
+     console.log(err.stack);
+  });
 
   var fs = require('fs');
   var readStream = fs.createReadStream(hostPath + '/public');
@@ -153,6 +172,7 @@ function acceptHosts(node)
     writeStream.end();
   });
   $('#edit-area').attr('contenteditable', true);
+  alert('更换host成功,当前使用的hosts方案是 ' + node.find('span').html());
 }
 
 $('#root-minus').click(function() {
@@ -404,9 +424,9 @@ function addHost()
     var idx = hostList.length;
     hostList[idx] = {"id" : "node" + (idx+1), "name" : $('#host-name').val(), "active" : false, "img_name" : "icon_" + img_idx + ".png"};
     writeConfigFile('hostList.json', hostList);
-    addNode("node" + (idx+1), $('#host-name').val(), "icon_" + img_idx + '.png', false);
     $('#bg').hide();
     $('#add-form').hide();
+    window.location.reload();
   }
 }
 

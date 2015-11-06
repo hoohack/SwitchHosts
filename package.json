@@ -2,7 +2,7 @@
 	"name" : "SwitchHosts",
 	"main" : "index.html",
 	"window" : {
-			"toolbar" : false,
+			"toolbar" : true,
 			"width" : 807,
 			"height": 607,
 			"title" : "SwitchHosts",

@@ -123,35 +123,16 @@ function acceptHosts(node)
   }
   node.addClass('accept');
   var class_name = node.attr('id');
-
   var fs = require('fs');
-  var readStream = fs.createReadStream(hostPath + '/public');
-  var writeStream = fs.createWriteStream(sysHostPath);
-
-  readStream.on('data', function(chunk) { // 当有数据流出时，写入数据
-      if (writeStream.write(chunk) === false) { // 如果没有写完，暂停读取流
-          readStream.pause();
-      }
-  });
-
-  writeStream.on('drain', function() { // 写完后，继续读取
-      readStream.resume();
-  });
-  var hostReadStream = fs.createReadStream(hostPath + '/' + class_name);
-  hostReadStream.on('data', function(chunk) {
-    if (writeStream.write(chunk) == false) {
-      hostReadStream.pause();
+  var pub_content = fs.readFileSync(hostPath + '/public', 'UTF8');
+  var host_content = fs.readFileSync(hostPath + '/' + class_name, 'UTF8');
+  fs.writeFile(sysHostPath, pub_content + host_content, function(err) {
+    if (err) {
+      return console.error(err);
     }
+    alert('更换host成功,当前使用的hosts方案是 ' + node.find('span').html());
+    $('#edit-area').attr('contenteditable', true);
   });
-
-  writeStream.on('drain', function() { // 写完后，继续读取
-      hostReadStream.resume();
-  });
-
-  hostReadStream.on('end', function() {
-    writeStream.end();
-  });
-  $('#edit-area').attr('contenteditable', true);
 }
 
 $('#root-minus').click(function() {
@@ -826,14 +807,17 @@ $('#accept-btn').on('click', function() {
 
     var fs = require('fs'),
       html_str = $('#edit-area').html(),
-      file_name_prefix = $('.active-li').attr('id');
+      file_name = $('.active-li').attr('id');
 
     if (html_str.indexOf('<br>') == -1 && html_str.length != 0) {
       html_str += "<br>";
     }
     var data = filterTag(html_str);
-    fs.writeFile(hostPath + '/' + file_name_prefix, data);
-    acceptHosts(node);
-    alert('更换host成功,当前使用的hosts方案是 ' + node.find('span').html());
+    fs.writeFile(hostPath + '/' + file_name, data, function(err) {
+      if (err) {
+        return console.error(err);
+      }
+      acceptHosts(node);
+    });
   }
 });

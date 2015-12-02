@@ -6,10 +6,12 @@ var dataPath = gui.App.dataPath,
   cfgPath = path.join(dataPath, "/config"),
   hostPath = path.join(dataPath, "/host"),
   os_type = os.type();
-var sysHostPath = '/etc/hosts';
+var sysHostPath = '/etc/hosts',
+  new_line = "\n";
 if (os_type == 'Windows_NT')
 {
   sysHostPath = "C:\\Windows\\System32\\drivers\\etc\\hosts";
+  new_line = "\r\n";
 }
 
 var $localHostList = $('#local-host-list'),
@@ -30,13 +32,13 @@ function readLines(input) {
   input.on('data', function(data) {
     remaining += data;
     flag = true;
-    var index = remaining.indexOf('\n');
+    var index = remaining.indexOf(new_line);
     while (index > -1) {
       var line = remaining.substring(0, index);
       remaining = remaining.substring(index + 1);
       line = line + '<br>';
       result += line;
-      index = remaining.indexOf('\n');
+      index = remaining.indexOf(new_line);
     }
     $('#edit-area').html(result);
   });
@@ -167,9 +169,9 @@ function filterTag(str) {
   return str.replace(/(\<div\>)/gm, "")
   .replace(/&nbsp;&nbsp;&nbsp;&nbsp;/g, "\t")
   .replace(/&nbsp;/g, '')
-  .replace(/(\<br\>\<\/div\>)/g, "\n")
-  .replace(/(\<\/div\>)/g, "\n")
-  .replace(/(\<br\>)/g, "\n");
+  .replace(/(\<br\>\<\/div\>)/g, new_line)
+  .replace(/(\<\/div\>)/g, new_line)
+  .replace(/(\<br\>)/g, new_line);
 }
 
 $('#edit-area').keydown(function(event) {
@@ -285,7 +287,7 @@ function readDefaultList()
     $.each(cfg, function(idx, obj) {
       if (obj.id == 'public-host')
       {
-        writeDefaultFile('public', "# 这里是公用host\n");
+        writeDefaultFile('public', "# 这里是公用host" + new_line);
       }
     });
     return cfg;
@@ -321,7 +323,7 @@ function readHostList()
         }
     }
     $.each(cfg, function(idx, obj) {
-      writeDefaultFile(obj.id, "# 这里是" + obj.name + "\n");
+      writeDefaultFile(obj.id, "# 这里是" + obj.name + new_line);
     });
     return cfg;
 }
@@ -393,7 +395,7 @@ function addHost()
     var host_name = 'node' + (hostList.length+1);
     var file_name = hostPath + '/' + host_name;
 
-    writeDefaultFile(host_name, "# 这里是" + $('#host-name').val() + "\n");
+    writeDefaultFile(host_name, "# 这里是" + $('#host-name').val() + new_line);
     var idx = hostList.length;
     hostList[idx] = {"id" : "node" + (idx+1), "name" : $('#host-name').val(), "active" : false, "img_name" : "icon_" + img_idx + ".png"};
     writeConfigFile('hostList.json', hostList);

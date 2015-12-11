@@ -5,62 +5,6 @@ var SwitchHosts = (function() {
   defaultHostList = readDefaultList();
   hostList = readHostList();
 
-  function addMenu()
-  {
-    //设置菜单
-    var menubar = new gui.Menu({ type: 'menubar' });
-    var sub_file = new gui.Menu();
-
-    var new_host_item = new gui.MenuItem({
-      label: '新建',
-      click: function() {
-
-      }
-    });
-
-    var export_item = new gui.MenuItem({
-      label: '导出',
-      click: function() {
-
-      }
-    });
-
-    var import_item = new gui.MenuItem({
-      label: '导入',
-      click: function() {
-
-      }
-    });
-
-    var exit_item = new gui.MenuItem({
-      label: '退出',
-      click: function() {
-        gui.App.quit();
-      }
-    });
-
-    sub_file.append(import_item);
-    sub_file.append(new_host_item);
-    sub_file.append(export_item);
-    sub_file.append(exit_item);
-
-    menubar.append(new gui.MenuItem({ label: '文件', submenu: sub_file }));
-
-    var sub_help = new gui.Menu();
-    var about_item = new gui.MenuItem({
-      label: '关于',
-      click: function() {
-
-      }
-    });
-
-    sub_help.append(about_item);
-    menubar.append(new gui.MenuItem({ label: '帮助', submenu: sub_help }));
-    var win = gui.Window.get();
-
-    win.menu = menubar;
-  }
-
   function bindDefaultClick()
   {
     $('#public-host').click(function() {
@@ -93,7 +37,6 @@ var SwitchHosts = (function() {
   function start()
   {
     console.log('starting...');
-    addMenu();
     if ($('.default-node').length == 2) {
       console.log('excute');
       $('#default-list li').first().remove();
